@@ -1,8 +1,9 @@
 const mongoose = require('mongoose')
 require('dotenv').config();
 
-mongoose.connect(process.env.MONGODB_URI, {
-    dbName: process.env.DB_NAME,
+const URI = `mongodb+srv://${process.env.MONGODB_USER}:${process.env.MONGODB_PASS}@project-noticeboard.7gr5hyw.mongodb.net/project-NoticeBoard?retryWrites=true&w=majority
+DB_NAME = project-NoticeBoard`
+mongoose.connect(URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
