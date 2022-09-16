@@ -5,6 +5,8 @@ const Notice = require('../models/noticeModel');
 const User = require('../models/userModel');
 const {signAccessToken} = require('../helpers/generateAccessToken')
 const {verifyAccessToken} = require('../helpers/verifyAccessToken')
+const jwt_decode = require("jwt-decode");
+require('dotenv').config();
 
 router.post('/login', async (req, res, next) => {
     try {
@@ -85,5 +87,30 @@ router.delete('/notice', verifyAccessToken, (req, res, next) =>{
         console.log(err);
         res.status(500).send({msg : "Error"});
     })
+})
+
+router.post('/addAdmin', verifyAccessToken, async (req, res, next) => {
+    try {
+        const cookies = req.cookies;
+        const token = cookies.ACCESS_TOKEN
+        var decoded = jwt_decode(token);
+        if(decoded.aud !== process.env.SUPER_ADMIN) throw createError.Unauthorized();
+        const user = new User({
+            UserId : req.body.UserId,
+            Password : req.body.Password,
+            DSign : req.body.DSign
+        })
+        user.save()
+        .then(result =>{
+            res.status(200).send(req.body);
+        })
+        .catch(err =>{
+            console.log(err);
+            res.status(500).send({msg : "Error"});
+        })
+    } catch (error) {
+        res.send(error)
+    }
+  
 })
 module.exports = router
