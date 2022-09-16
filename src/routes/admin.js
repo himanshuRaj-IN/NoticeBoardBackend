@@ -23,9 +23,67 @@ router.post('/login', async (req, res, next) => {
 
 router.post('/notice',verifyAccessToken, async (req, res, next)=>{
     try {
-        res.status(200).send({message : "Authrorised user"});
+        const notice = new  Notice({ 
+            RefNo:req.body.RefNo,
+            IssueDate: req.body.IssueDate,
+            Subject: req.body.Subject,
+            Tags: req.body.Tags,
+            Body: req.body.Body,
+            IssuerName: req.body.IssuerName,
+            IssuerDesignation:req.body.IssuerDesignation,
+            LastModifiedOn : req.body.LastModifiedOn,
+            PostedBy: req.body.PostedBy
+        })
+        notice.save()
+        .then(result =>{
+            console.log("Saved sucessfully")
+            res.status(200).send(req.body);
+        })
+        .catch(err =>{
+            console.log(err);
+            res.status(500).send({msg : "Error"});
+        })
     } catch (error) {
         res.send(error)
     }
 } )
+
+router.put('/notice', verifyAccessToken, (req, res, next) =>{
+    const querypram = req.query
+    Notice.findOneAndUpdate({RefNo:querypram.RefNo},{
+        $set:{
+            RefNo:req.body.RefNo,
+            IssueDate: req.body.IssueDate,
+            Subject: req.body.Subject,
+            Tags: req.body.Tags,
+            Body: req.body.Body,
+            IssuerName: req.body.IssuerName,
+            IssuerDesignation:req.body.IssuerDesignation,
+            LastModifiedOn : req.body.LastModifiedOn, 
+            PostedBy: req.body.PostedBy
+        }
+    })
+    .then(result =>{
+        console.log('Updated Successfully');
+        res.status(200).send(req.body);
+    })
+    .catch(err =>{
+        console.log(err);
+        res.status(500).send({msg : "Error"});
+    })
+    
+})
+
+router.delete('/notice', verifyAccessToken, (req, res, next) =>{
+    const querypram = req.query
+    Notice.findOneAndDelete({RefNo:querypram.RefNo})
+    .then(result =>{
+        console.log('Deleted Successfully');
+        res.status(200).send({message : 'Deleted Sucessfully'});
+    })
+    .catch(err =>{
+        console.log(err);
+        res.status(500).send({msg : "Error"});
+    })
+})
 module.exports = router
